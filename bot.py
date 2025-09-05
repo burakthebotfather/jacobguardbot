@@ -87,12 +87,12 @@ async def monitor_section(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         chat_id=chat_id,
                         user_id=user_id,
                         permissions=ChatPermissions(can_send_messages=False),
-                        until_date=datetime.datetime.now(tz=MINSK_TZ) + datetime.timedelta(hours=24)
+                        until_date=datetime.datetime.now(tz=MINSK_TZ) + datetime.timedelta(seconds=33)
                     )
                     await context.bot.send_message(
                         chat_id=chat_id,
                         message_thread_id=thread_id,
-                        text=f"🚫 {username} получил 3 предупреждения и был ограничен в правах на 24 часа."
+                        text=f"🚫 {username} получил 3 предупреждения и был ограничен в правах на 33 секунды."
                     )
                 except Exception as e:
                     print(f"[ERROR] Не удалось замутить пользователя: {e}")
