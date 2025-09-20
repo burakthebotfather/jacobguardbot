@@ -4,14 +4,13 @@ import datetime
 import pytz
 from collections import defaultdict
 
-from telegram import Update, Message, ChatPermissions
+from telegram import Update, Message
 from telegram.ext import Application, MessageHandler, ContextTypes, filters
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 # === Настройки ===
 TOKEN = "7684439594:AAGE58iJTS1V-wjiKFdViAmcVKyImUnr15Y"
-ADMIN_CHAT_ID = 542345855  # <-- сюда вставь Telegram ID админа
 MINSK_TZ = pytz.timezone("Europe/Minsk")
 
 # Чаты и допустимые треды
@@ -78,30 +77,6 @@ async def monitor_section(update: Update, context: ContextTypes.DEFAULT_TYPE):
             warning_counts[user_id] += 1
             count = warning_counts[user_id]
             print(f"[WARN] {username} получил предупреждение ({count}/3)")
-
-            # Уведомление админу
-            await context.bot.send_message(
-                chat_id=ADMIN_CHAT_ID,
-                text=f"⚠️ Нарушение от {username} (ID: {user_id}) в чате {chat_id}/{thread_id}. "
-                     f"Предупреждений: {count}/3"
-            )
-
-            # Мут при 3 предупреждениях
-            if count >= 3:
-                try:
-                    await context.bot.restrict_chat_member(
-                        chat_id=chat_id,
-                        user_id=user_id,
-                        permissions=ChatPermissions(can_send_messages=False),
-                        until_date=datetime.datetime.now(tz=MINSK_TZ) + datetime.timedelta(seconds=33)
-                    )
-                    await context.bot.send_message(
-                        chat_id=chat_id,
-                        message_thread_id=thread_id,
-                        text=f"🚫 {username} получил 3 предупреждения и был ограничен в правах на 33 секунды."
-                    )
-                except Exception as e:
-                    print(f"[ERROR] Не удалось замутить пользователя: {e}")
 
             # Удаление через 15 секунд
             await asyncio.sleep(15)
